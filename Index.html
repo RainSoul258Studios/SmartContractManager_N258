@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL SISTEMA — Cloud Edition</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --cyan: #00ffff;
+            --bg: #020202;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .n258-border { border: 1px solid var(--cyan); }
+        .n258-glow { box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
+        
+        /* Custom scrollbar para estética industrial */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--cyan); }
+
+        .loading-bar {
+            height: 2px;
+            background: var(--cyan);
+            animation: loading 2s infinite;
+        }
+        @keyframes loading {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // CONFIGURACIÓN DE BACKEND REAL (Supabase o Cloudflare Endpoint)
+        const API_URL = "https://your-worker-proxy.workers.dev/api"; 
+
+        const Layout = ({ children, activeTab, setActiveTab }) => (
+            <div className="min-h-screen flex flex-col p-4 md:p-8">
+                <header className="border-b border-cyan-400 pb-4 mb-6 flex justify-between items-center">
+                    <h1 className="text-xl font-bold tracking-widest">EL SISTEMA // V5.5</h1>
+                    <div className="text-xs">STATUS: <span className="animate-pulse">ONLINE</span></div>
+                </header>
+
+                <nav className="flex gap-4 mb-8 overflow-x-auto pb-2">
+                    {['RADAR', 'PIPELINE', 'REPORTS', 'REWARDS', 'PROFILE'].map(tab => (
+                        <button 
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-1 border ${activeTab === tab ? 'bg-cyan-400 text-black' : 'border-cyan-400 text-cyan-400'}`}
+                        >
+                            [{tab}]
+                        </button>
+                    ))}
+                </nav>
+
+                <main className="flex-grow">
+                    {children}
+                </main>
+
+                <footer className="mt-8 pt-4 border-t border-cyan-900 text-[10px] opacity-50">
+                    RAINS OUL 258 STUDIOS // ARCHITECTURE: MODULAR SERVERLESS
+                </footer>
+            </div>
+        );
+
+        const Radar = () => (
+            <div className="grid gap-4">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="n258-border p-4 bg-zinc-900/50">
+                        <div className="flex justify-between mb-2">
+                            <span className="font-bold">BOUNTY_ID: 0x{i}F4</span>
+                            <span className="text-white bg-red-600 px-2">CRITICAL</span>
+                        </div>
+                        <p className="text-sm opacity-80 text-white">REWARD: 5,000 USDC</p>
+                        <div className="mt-2 text-[10px]">SOURCE: IMMUNEFI_CLONE_SYNC</div>
+                    </div>
+                ))}
+            </div>
+        );
+
+        const Pipeline = () => {
+            const [logs, setLogs] = useState(["READY TO START..."]);
+            const [running, setRunning] = useState(false);
+
+            const runSequence = () => {
+                setRunning(true);
+                const newLogs = ["INITIALIZING RS258 V5 PRO...", "ALLOCATING RAM...", "SCANNING NODE BLOCKS...", "ANALYZING SMART CONTRACTS..."];
+                newLogs.forEach((msg, i) => {
+                    setTimeout(() => {
+                        setLogs(prev => [...prev, `> ${msg}`]);
+                        if(i === newLogs.length -1) setRunning(false);
+                    }, (i + 1) * 800);
+                });
+            };
+
+            return (
+                <div className="n258-border p-6 bg-black">
+                    <button onClick={runSequence} disabled={running} className="mb-4 w-full py-2 border border-cyan-400 hover:bg-cyan-400 hover:text-black transition">
+                        {running ? "EXECUTING..." : "START SCAN SEQUENCE"}
+                    </button>
+                    <div className="bg-zinc-900 p-4 h-64 overflow-y-auto font-mono text-xs">
+                        {logs.map((log, i) => <div key={i} className="mb-1">{log}</div>)}
+                        {running && <div className="loading-bar mt-2"></div>}
+                    </div>
+                </div>
+            );
+        };
+
+        const Profile = () => (
+            <div className="flex flex-col items-center py-10">
+                <div className="w-32 h-32 n258-border mb-4 flex items-center justify-center bg-zinc-900 text-4xl">N</div>
+                <h2 className="text-2xl font-bold">NILTON 258</h2>
+                <p className="opacity-60 text-sm mt-2">PRINCIPAL ARCHITECT</p>
+                <div className="mt-6 grid grid-cols-2 gap-4 w-full max-w-xs text-center">
+                    <div className="p-2 border border-cyan-900">REPORTS: 42</div>
+                    <div className="p-2 border border-cyan-900">RANK: ALPHA</div>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('RADAR');
+
+            return (
+                <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+                    {activeTab === 'RADAR' && <Radar />}
+                    {activeTab === 'PIPELINE' && <Pipeline />}
+                    {activeTab === 'PROFILE' && <Profile />}
+                    {(activeTab === 'REPORTS' || activeTab === 'REWARDS') && (
+                        <div className="text-center opacity-50 mt-20 italic">MODULE_PENDING_DB_SYNC</div>
+                    )}
+                </Layout>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
